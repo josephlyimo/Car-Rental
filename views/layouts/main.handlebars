@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Rental System</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Car Rental System</h1>
+    {{#if user}}
+      <p>Welcome, {{user.name}} | <a href="/users/logout">Logout</a></p>
+    {{else}}
+      <p><a href="/users/login">Login</a> | <a href="/users/register">Register</a></p>
+    {{/if}}
+    <hr />
+  </header>
+
+  {{{body}}}
+
+  <footer>
+    <hr />
+    <p>&copy; 2024 Car Rental System</p>
+  </footer>
+</body>
+</html>

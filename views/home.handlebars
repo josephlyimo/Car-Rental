@@ -1,0 +1,50 @@
+<h2>Available Cars</h2>
+
+<div>
+  <form id="filterForm">
+    <label for="color">Color:</label>
+    <select id="color" name="color">
+      <option value="" {{#unless filter.color}}selected{{/unless}}>All</option>
+      <option value="red" {{#if (eq filter.color "red")}}selected{{/if}}>Red</option>
+      <option value="blue" {{#if (eq filter.color "blue")}}selected{{/if}}>Blue</option>
+      <option value="black" {{#if (eq filter.color "black")}}selected{{/if}}>Black</option>
+      <option value="white" {{#if (eq filter.color "white")}}selected{{/if}}>White</option>
+    </select>
+
+    <label for="type">Type:</label>
+    <select id="type" name="type">
+      <option value="" {{#unless filter.type}}selected{{/unless}}>All</option>
+      <option value="tour" {{#if (eq filter.type "tour")}}selected{{/if}}>Tour</option>
+      <option value="ceremony" {{#if (eq filter.type "ceremony")}}selected{{/if}}>Ceremony</option>
+      <option value="private" {{#if (eq filter.type "private")}}selected{{/if}}>Private</option>
+    </select>
+
+    <button type="submit">Filter</button>
+  </form>
+</div>
+
+<div id="car-list">
+  {{#each cars}}
+    <div class="car-item">
+      <h3>{{this.name}}</h3>
+      <p>Type: {{this.type}}</p>
+      <p>Color: {{this.color}}</p>
+      <p>Status: {{this.status}}</p>
+      <a href="/cars/{{this.id}}">View Details</a>
+    </div>
+  {{else}}
+    <p>No cars available at the moment.</p>
+  {{/each}}
+</div>
+
+<script>
+  document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const color = document.getElementById('color').value;
+    const type = document.getElementById('type').value;
+    let query = '?';
+    if (color) query += 'color=' + encodeURIComponent(color) + '&';
+    if (type) query += 'type=' + encodeURIComponent(type) + '&';
+    window.location.href = '/' + query.slice(0, -1);
+  });
+</script>
