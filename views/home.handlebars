@@ -1,7 +1,7 @@
 <h2>Available Cars</h2>
 
 <div>
-  <form id="filterForm">
+  <form id="filterForm" autocomplete="off" style="margin-bottom: 20px;">
     <label for="color">Color:</label>
     <select id="color" name="color">
       <option value="" {{#unless filter.color}}selected{{/unless}}>All</option>
@@ -21,6 +21,69 @@
 
     <button type="submit">Filter</button>
   </form>
+
+  <form id="searchForm" autocomplete="off" style="margin-bottom: 20px; position: relative;">
+    <label for="searchInput">Search Cars:</label>
+    <input type="text" id="searchInput" name="search" placeholder="Search cars...">
+    <button type="submit">Search</button>
+  <div id="suggestions" style="border: 1px solid #ccc; max-width: 300px; max-height: 150px; overflow-y: auto; display: none; position: absolute; background: white; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
+  </form>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsBox = document.getElementById('suggestions');
+    const searchForm = document.getElementById('searchForm');
+
+    searchInput.addEventListener('input', async () => {
+      const query = searchInput.value.trim();
+      console.log('Search input changed:', query);
+      if (query.length === 0) {
+        suggestionsBox.style.display = 'none';
+        suggestionsBox.innerHTML = '';
+        return;
+      }
+      try {
+        const response = await fetch(`/cars/search-suggestions?q=${encodeURIComponent(query)}`);
+        console.log('Fetch response status:', response.status);
+        const suggestions = await response.json();
+        console.log('Suggestions received:', suggestions);
+        if (suggestions.length === 0) {
+          suggestionsBox.style.display = 'none';
+          suggestionsBox.innerHTML = '';
+          return;
+        }
+        suggestionsBox.innerHTML = suggestions.map(s => `<div class="suggestion-item" style="padding: 5px; cursor: pointer;">${s}</div>`).join('');
+        suggestionsBox.style.display = 'block';
+
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+          item.addEventListener('click', () => {
+            searchInput.value = item.textContent;
+            suggestionsBox.style.display = 'none';
+            suggestionsBox.innerHTML = '';
+          });
+        });
+      } catch (err) {
+        console.error('Error fetching suggestions:', err);
+        suggestionsBox.style.display = 'none';
+        suggestionsBox.innerHTML = '';
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+        suggestionsBox.style.display = 'none';
+        suggestionsBox.innerHTML = '';
+      }
+    });
+
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      if (query.length > 0) {
+        window.location.href = `/search?query=${encodeURIComponent(query)}`;
+      }
+    });
+  </script>
 </div>
 
 <div id="car-list">

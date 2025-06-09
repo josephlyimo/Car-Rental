@@ -1,0 +1,25 @@
+<h2>{{car.name}}</h2>
+
+<div>
+  <strong>Color:</strong> {{car.color}}<br>
+  <strong>Type:</strong> {{car.type}}<br>
+  <strong>Status:</strong> {{car.status}}<br>
+</div>
+
+<div>
+  <h3>Description</h3>
+  <p>{{car.description}}</p>
+</div>
+
+<div>
+  <h3>Images</h3>
+  {{#if car.images.length}}
+    {{#each car.images}}
+      <img src="{{this}}" alt="Car Image" style="max-width: 300px; margin: 5px;">
+    {{/each}}
+  {{else}}
+    <p>No images available.</p>
+  {{/if}}
+</div>
+
+<a href="/">Back to Home</a>

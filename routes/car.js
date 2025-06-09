@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Get all available cars with optional filters
 router.get('/', async (req, res) => {
-  const { color, type } = req.query;
+  const { color, type, search } = req.query;
   let query = 'SELECT * FROM cars WHERE status = ?';
   const params = ['available'];
 
@@ -16,6 +16,11 @@ router.get('/', async (req, res) => {
   if (type) {
     query += ' AND type = ?';
     params.push(type);
+  }
+  if (search) {
+    const searchTerm = `%${search}%`;
+    query += ' AND (name LIKE ? OR description LIKE ?)';
+    params.push(searchTerm, searchTerm);
   }
 
   try {
@@ -44,5 +49,27 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+  // Search suggestions endpoint for autocomplete
+  router.get('/search-suggestions', async (req, res) => {
+    const { q } = req.query;
+    console.log('Search suggestions query:', q);
+    if (!q || q.trim() === '') {
+      return res.json([]);
+    }
+    const searchTerm = `%${q.trim()}%`;
+    try {
+      const [results] = await db.execute(
+        `SELECT DISTINCT name FROM cars WHERE status = 'available' AND name LIKE ? LIMIT 10`,
+        [searchTerm]
+      );
+      const suggestions = results.map(row => row.name);
+      console.log('Suggestions:', suggestions);
+      res.json(suggestions);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
 module.exports = router;

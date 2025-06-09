@@ -1,0 +1,60 @@
+<h2>Book a Car</h2>
+
+<form id="bookingForm">
+  <label for="car_id">Select Car:</label>
+  <select id="car_id" name="car_id" required>
+    {{#each cars}}
+      <option value="{{id}}">{{name}} ({{color}}, {{type}})</option>
+    {{/each}}
+  </select>
+  <br><br>
+
+  <label for="purpose">Purpose:</label>
+  <select id="purpose" name="purpose" required>
+    <option value="tour">Tour</option>
+    <option value="ceremony">Ceremony</option>
+    <option value="private">Private</option>
+  </select>
+  <br><br>
+
+  <label for="start_date">Start Date:</label>
+  <input type="date" id="start_date" name="start_date" required>
+  <br><br>
+
+  <label for="end_date">End Date:</label>
+  <input type="date" id="end_date" name="end_date" required>
+  <br><br>
+
+  <button type="submit">Book Now</button>
+</form>
+
+<script>
+  const bookingForm = document.getElementById('bookingForm');
+  bookingForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(bookingForm);
+    const data = {
+      car_id: formData.get('car_id'),
+      purpose: formData.get('purpose'),
+      start_date: formData.get('start_date'),
+      end_date: formData.get('end_date')
+    };
+
+    try {
+      const response = await fetch('/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        alert('Booking created successfully!');
+        window.location.href = '/bookings/history';
+      } else {
+        const resData = await response.json();
+        alert('Error: ' + resData.message);
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  });
+</script>
