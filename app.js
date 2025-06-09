@@ -21,8 +21,17 @@ app.use(session({
   saveUninitialized: true,
 }));
 
+const hbs = exphbs.create({
+  defaultLayout: 'main',
+  helpers: {
+    eq: function(a, b) {
+      return a === b;
+    }
+  }
+});
+
 // Handlebars setup
-app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
