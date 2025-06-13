@@ -18,6 +18,25 @@
   <div>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required />
+    <div id="passwordFeedback" style="color: red; font-weight: bold; margin-top: 5px;"></div>
   </div>
   <button type="submit">Register</button>
 </form>
+
+<script>
+  const weakPasswords = ['123456', 'password', '123456789', '12345678', '12345', '1234', '111111', 'abcd', 'qwerty'];
+
+  const passwordInput = document.getElementById('password');
+  const feedback = document.getElementById('passwordFeedback');
+
+  passwordInput.addEventListener('input', () => {
+    const value = passwordInput.value;
+    if (weakPasswords.includes(value)) {
+      feedback.textContent = 'This password is too weak or guessable.';
+    } else if (value.length < 6) {
+      feedback.textContent = 'Password must be at least 6 characters long.';
+    } else {
+      feedback.textContent = '';
+    }
+  });
+</script>

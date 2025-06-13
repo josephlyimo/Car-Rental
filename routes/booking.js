@@ -22,6 +22,8 @@ function isAdmin(req, res, next) {
   res.status(403).json({ message: 'Forbidden' });
 }
 
+const moment = require('dayjs');
+
 // GET booking form with car_id and user info form
 router.get('/new', isAuthenticated, async (req, res) => {
   const user = req.session.user;
@@ -35,7 +37,8 @@ router.get('/new', isAuthenticated, async (req, res) => {
         car = carRows[0];
       }
     }
-    res.render('book', { user, cars, car });
+    const today = moment().format('YYYY-MM-DD');
+    res.render('book', { user, cars, car, today });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');

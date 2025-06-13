@@ -21,12 +21,24 @@ router.get('/logout', (req, res) => {
   });
 });
 
+const weakPasswords = ['123456', 'password', '123456789', '12345678', '12345', '1234', '111111', 'abcd', 'qwerty'];
+
+
 // Register user
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
     return res.status(400).render('register', { error: 'Please provide name, email and password' });
   }
+
+  if (name.length < 6) {
+    return res.status(400).render('register', { error: 'Name must be at least 6 characters long' });
+  }
+
+  if (weakPasswords.includes(password)) {
+    return res.status(400).render('register', { error: 'Password is too weak or guessable' });
+  }
+
   try {
     const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser.length > 0) {

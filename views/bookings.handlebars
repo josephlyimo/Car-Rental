@@ -38,6 +38,29 @@
 {{/if}}
 
 <script>
+  const notification = document.createElement('div');
+  notification.id = 'notification';
+  notification.style.position = 'fixed';
+  notification.style.top = '20px';
+  notification.style.left = '50%';
+  notification.style.transform = 'translateX(-50%)';
+  notification.style.backgroundColor = '#4caf50';
+  notification.style.color = 'white';
+  notification.style.padding = '10px';
+  notification.style.borderRadius = '5px';
+  notification.style.zIndex = '1000';
+  notification.style.display = 'none';
+  document.body.appendChild(notification);
+
+  function showNotification(message, isError = false) {
+    notification.textContent = message;
+    notification.style.backgroundColor = isError ? '#f44336' : '#4caf50';
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 5000);
+  }
+
   document.querySelectorAll('.return-btn').forEach(button => {
     button.addEventListener('click', async () => {
       const bookingId = button.getAttribute('data-id');
@@ -48,39 +71,66 @@
             headers: { 'Content-Type': 'application/json' }
           });
           if (response.ok) {
-            alert('Return marked successfully.');
+            showNotification('Return marked successfully.');
             location.reload();
           } else {
             const data = await response.json();
-            alert('Error: ' + data.message);
+            showNotification('Error: ' + data.message, true);
           }
         } catch (err) {
-          alert('Error: ' + err.message);
+          showNotification('Error: ' + err.message, true);
         }
       }
     });
   });
 
+  // Modal for cancel confirmation
+  const modalHtml = `
+    <div id="cancelModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+      <div style="background: white; padding: 20px; border-radius: 5px; max-width: 300px; text-align: center;">
+        <p>Are you sure you want to cancel this booking?</p>
+        <button id="confirmCancelBtn">OK</button>
+        <button id="cancelCancelBtn">Cancel</button>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  const cancelModal = document.getElementById('cancelModal');
+  let currentCancelId = null;
+
   document.querySelectorAll('.cancel-btn').forEach(button => {
-    button.addEventListener('click', async () => {
-      const bookingId = button.getAttribute('data-id');
-      if (confirm('Cancel this booking?')) {
-        try {
-          const response = await fetch(`/bookings/${bookingId}/cancel`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          });
-          if (response.ok) {
-            alert('Booking cancelled successfully.');
-            location.reload();
-          } else {
-            const data = await response.json();
-            alert('Error: ' + data.message);
-          }
-        } catch (err) {
-          alert('Error: ' + err.message);
-        }
-      }
+    button.addEventListener('click', () => {
+      currentCancelId = button.getAttribute('data-id');
+      cancelModal.style.display = 'flex';
     });
+  });
+
+  document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
+    if (!currentCancelId) return;
+    try {
+      const response = await fetch(`/bookings/${currentCancelId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (response.ok) {
+        showNotification('Booking cancelled successfully.');
+        location.reload();
+      } else {
+        const data = await response.json();
+        showNotification('Error: ' + data.message, true);
+      }
+    } catch (err) {
+      showNotification('Error: ' + err.message, true);
+    } finally {
+      cancelModal.style.display = 'none';
+      currentCancelId = null;
+    }
+  });
+
+  document.getElementById('cancelCancelBtn').addEventListener('click', () => {
+    cancelModal.style.display = 'none';
+    currentCancelId = null;
   });
 </script>

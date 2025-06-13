@@ -24,15 +24,27 @@
   {{/unless}}
 
   <label for="start_date">Start Date:</label>
-  <input type="date" id="start_date" name="start_date" required>
+  <input type="date" id="start_date" name="start_date" required min="{{today}}">
 
   <label for="end_date">End Date:</label>
-  <input type="date" id="end_date" name="end_date" required>
+  <input type="date" id="end_date" name="end_date" required min="{{today}}">
 
   <button type="submit">Book Now</button>
 </form>
 
+<div id="notification" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; z-index: 1000;"></div>
+
 <script>
+  function showNotification(message, isError = false) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.backgroundColor = isError ? '#f44336' : '#4caf50';
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 5000);
+  }
+
   const bookingForm = document.getElementById('bookingForm');
   bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -51,14 +63,16 @@
         body: JSON.stringify(data)
       });
       if (response.ok) {
-        alert('Booking created successfully!');
-        window.location.href = '/bookings/history';
+        showNotification('Booking created successfully!');
+        setTimeout(() => {
+          window.location.href = '/bookings/history';
+        }, 5000);
       } else {
         const resData = await response.json();
-        alert('Error: ' + resData.message);
+        showNotification('Error: ' + resData.message, true);
       }
     } catch (err) {
-      alert('Error: ' + err.message);
+      showNotification('Error: ' + err.message, true);
     }
   });
 </script>
