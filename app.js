@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
@@ -21,6 +22,12 @@ app.use(session({
   saveUninitialized: true,
 }));
 
+// Make user session available in views
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
+
 const hbs = exphbs.create({
   defaultLayout: 'main',
   helpers: {
@@ -42,9 +49,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 const userRoutes = require('./routes/user');
 const carRoutes = require('./routes/car');
 const bookingRoutes = require('./routes/booking');
+const adminRoutes = require('./routes/admin');
 
 app.use('/users', userRoutes);
 app.use('/cars', carRoutes);
+app.use('/admin', adminRoutes);
 // Car detail page
 app.get('/cars/:id', async (req, res) => {
   const carId = req.params.id;
@@ -80,6 +89,15 @@ app.get('/', async (req, res) => {
 
   try {
     const [cars] = await db.execute(query, params);
+
+    // Fetch images for each car
+    for (const car of cars) {
+      const [images] = await db.execute('SELECT image_url FROM car_images WHERE car_id = ?', [car.id]);
+      car.images = images.map(img => img.image_url);
+      // For backward compatibility, set image_url to first image if exists
+      car.image_url = car.images.length > 0 ? car.images[0] : null;
+    }
+
     res.render('home', { user: req.session.user, cars, filter: { color, type } });
   } catch (err) {
     console.error(err);

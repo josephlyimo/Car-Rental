@@ -1,0 +1,50 @@
+<h2>Admin Booking Management</h2>
+
+<p>Welcome, {{user.name}}</p>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Car</th>
+      <th>Customer</th>
+      <th>Purpose</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each bookings}}
+    <tr>
+      <td>
+        <strong>{{this.car_name}}</strong><br />
+        Type: {{this.type}}<br />
+        Color: {{this.color}}<br />
+        Description: {{this.description}}
+      </td>
+      <td>{{this.user_name}}<br />{{this.user_email}}</td>
+      <td>{{this.purpose}}</td>
+      <td>{{this.start_date}}</td>
+      <td>{{this.end_date}}</td>
+      <td>{{this.status}}</td>
+      <td>
+        {{#if (eq this.status "pending")}}
+          <form action="/admin/bookings/confirm/{{this.id}}" method="POST" style="display:inline;">
+            <button type="submit">Confirm Booking</button>
+          </form>
+        {{else if (eq this.status "booked")}}
+          <form action="/admin/bookings/mark-returned/{{this.id}}" method="POST" style="display:inline;">
+            <button type="submit">Mark as Returned</button>
+          </form>
+          <span>Not Returned / Pending</span>
+        {{else if (eq this.status "returned")}}
+          <span>Returned</span>
+        {{else}}
+          N/A
+        {{/if}}
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

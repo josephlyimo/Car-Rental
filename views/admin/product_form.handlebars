@@ -1,0 +1,38 @@
+<h2>{{#if product}}Edit{{else}}Add New{{/if}} Product</h2>
+
+<form action="{{#if product}}/admin/products/edit/{{product.id}}{{else}}/admin/products/new{{/if}}" method="POST" enctype="multipart/form-data">
+  <label for="name">Name:</label><br />
+  <input type="text" id="name" name="name" value="{{#if product}}{{product.name}}{{/if}}" required /><br />
+
+  <label for="type">Type:</label><br />
+  <select id="type" name="type" required>
+    <option value="">Select type</option>
+    <option value="tour" {{#if product}}{{#if (eq product.type "tour")}}selected{{/if}}{{/if}}>tour</option>
+    <option value="ceremony" {{#if product}}{{#if (eq product.type "ceremony")}}selected{{/if}}{{/if}}>ceremony</option>
+    <option value="private" {{#if product}}{{#if (eq product.type "private")}}selected{{/if}}{{/if}}>private</option>
+  </select><br />
+
+  <label for="color">Color:</label><br />
+  <input type="text" id="color" name="color" value="{{#if product}}{{product.color}}{{/if}}" required /><br />
+
+  <label for="status">Status:</label><br />
+  <select id="status" name="status" required>
+    <option value="available" {{#if product}}{{#if (eq product.status "available")}}selected{{/if}}{{/if}}>Available</option>
+    <option value="booked" {{#if product}}{{#if (eq product.status "booked")}}selected{{/if}}{{/if}}>Booked</option>
+    <option value="not-available" {{#if product}}{{#if (eq product.status "not-available")}}selected{{/if}}{{/if}}>Not Available</option>
+  </select><br />
+
+  <label for="description">Description:</label><br />
+  <input type="text" id="description" name="description" value="{{#if product}}{{product.description}}{{/if}}" /><br />
+
+  <label for="image">Image:</label><br />
+  <input type="file" id="image" name="image" accept="image/*" /><br />
+  {{#if product}}
+    {{#if product.images.length}}
+      <img src="{{product.images.[0]}}" alt="{{product.name}}" width="150" />
+    {{/if}}
+  {{/if}}
+
+  <br />
+  <button type="submit">{{#if product}}Update{{else}}Add{{/if}} Product</button>
+</form>

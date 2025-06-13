@@ -86,14 +86,35 @@
   </script>
 </div>
 
+{{#if user}}
+  {{#if (eq user.role "user")}}
+    <div style="margin-bottom: 20px;">
+      <a href="/bookings/new" class="btn btn-primary">Continue Booking</a>
+    </div>
+  {{else if (eq user.role "admin")}}
+    <div style="margin-bottom: 20px;">
+      <a href="/bookings/history" class="btn btn-secondary">View Bookings</a>
+    </div>
+  {{/if}}
+{{/if}}
+
 <div id="car-list">
   {{#each cars}}
     <div class="car-item">
+      {{#if this.image_url}}
+        <img src="{{this.image_url}}" alt="{{this.name}}" style="max-width: 200px; max-height: 150px;" />
+      {{/if}}
       <h3>{{this.name}}</h3>
+      <p>Description: {{{this.description}}}</p>
       <p>Type: {{this.type}}</p>
       <p>Color: {{this.color}}</p>
       <p>Status: {{this.status}}</p>
       <a href="/cars/{{this.id}}">View Details</a>
+      {{#if (eq ../user.role "user")}}
+        <div style="margin-top: 10px;">
+          <a href="/bookings/new?car_id={{this.id}}" class="btn btn-primary">Book This Car</a>
+        </div>
+      {{/if}}
     </div>
   {{else}}
     <p>No cars available at the moment.</p>

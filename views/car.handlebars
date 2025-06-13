@@ -1,25 +1,14 @@
 <h2>{{car.name}}</h2>
+<p>Type: {{car.type}}</p>
+<p>Color: {{car.color}}</p>
+<p>Status: {{car.status}}</p>
+<p>Description: {{car.description}}</p>
 
-<div>
-  <strong>Color:</strong> {{car.color}}<br>
-  <strong>Type:</strong> {{car.type}}<br>
-  <strong>Status:</strong> {{car.status}}<br>
-</div>
-
-<div>
-  <h3>Description</h3>
-  <p>{{car.description}}</p>
-</div>
-
-<div>
-  <h3>Images</h3>
-  {{#if car.images.length}}
-    {{#each car.images}}
-      <img src="{{this}}" alt="Car Image" style="max-width: 300px; margin: 5px;">
-    {{/each}}
-  {{else}}
-    <p>No images available.</p>
-  {{/if}}
-</div>
-
-<a href="/">Back to Home</a>
+{{#if user}}
+  <form action="/bookings/new" method="GET">
+    <input type="hidden" name="car_id" value="{{car.id}}" />
+    <button type="submit">Proceed to Booking</button>
+  </form>
+{{else}}
+  <p><a href="/users/login">Login</a> to proceed with booking.</p>
+{{/if}}

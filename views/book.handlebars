@@ -1,29 +1,33 @@
 <h2>Book a Car</h2>
 
 <form id="bookingForm">
-  <label for="car_id">Select Car:</label>
-  <select id="car_id" name="car_id" required>
-    {{#each cars}}
-      <option value="{{id}}">{{name}} ({{color}}, {{type}})</option>
-    {{/each}}
-  </select>
-  <br><br>
+  {{#if car}}
+    <p>Car Name: {{car.name}}</p>
+    <p>Car Color: {{car.color}}</p>
+    <p>Car Type: {{car.type}}</p>
+    <input type="hidden" id="car_id" name="car_id" value="{{car.id}}" />
+    <p>Purpose: {{car.type}}</p>
+    <input type="hidden" id="purpose" name="purpose" value="{{car.type}}" />
+  {{else}}
+    {{#with cars.[0]}}
+      <p>Car Name: {{name}}</p>
+      <p>Car Color: {{color}}</p>
+      <p>Car Type: {{type}}</p>
+      <input type="hidden" id="car_id" name="car_id" value="{{id}}" />
+      <p>Purpose: {{type}}</p>
+      <input type="hidden" id="purpose" name="purpose" value="{{type}}" />
+    {{/with}}
+  {{/if}}
 
-  <label for="purpose">Purpose:</label>
-  <select id="purpose" name="purpose" required>
-    <option value="tour">Tour</option>
-    <option value="ceremony">Ceremony</option>
-    <option value="private">Private</option>
-  </select>
-  <br><br>
+  {{#unless car}}
+  {{!-- This block is now redundant because the else block above handles the no car case --}}
+  {{/unless}}
 
   <label for="start_date">Start Date:</label>
   <input type="date" id="start_date" name="start_date" required>
-  <br><br>
 
   <label for="end_date">End Date:</label>
   <input type="date" id="end_date" name="end_date" required>
-  <br><br>
 
   <button type="submit">Book Now</button>
 </form>
