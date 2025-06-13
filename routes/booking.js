@@ -83,24 +83,24 @@ router.post('/', isAuthenticated, async (req, res) => {
   try {
     // Check if car is available for the requested period (no overlapping bookings)
     const [overlaps] = await db.execute(
-      `SELECT * FROM bookings WHERE car_id = ? AND status IN ('booked', 'rented') AND NOT (end_date < ? OR start_date > ?)`,
+      `SELECT * FROM bookings WHERE car_id = ? AND status IN ('pending', 'booked', 'rented') AND NOT (end_date < ? OR start_date > ?)`,
       [car_id, start_date, end_date]
     );
     if (overlaps.length > 0) {
       return res.status(409).json({ message: 'Car is already booked for the selected dates' });
     }
 
-    // Insert booking with status 'booked'
+    // Insert booking with status 'pending'
     await db.execute(
-      `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, 'booked')`,
+      `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, 'pending')`,
       [user_id, car_id, purpose, start_date, end_date]
     );
 
-    // Update car status to 'booked'
-    await db.execute(
-      `UPDATE cars SET status = 'booked' WHERE id = ?`,
-      [car_id]
-    );
+    // Remove car status update here; admin will update car status upon confirmation
+    // await db.execute(
+    //   `UPDATE cars SET status = 'booked' WHERE id = ?`,
+    //   [car_id]
+    // );
 
     res.status(201).json({ message: 'Booking created successfully' });
   } catch (err) {

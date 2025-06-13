@@ -224,10 +224,10 @@ router.post('/bookings/accept/:id', isAdmin, async (req, res) => {
     );
     if (bookings.length > 0) {
       const carId = bookings[0].car_id;
-      await db.execute(
-        `UPDATE cars SET status = 'not-available' WHERE id = ?`,
-        [carId]
-      );
+    await db.execute(
+      `UPDATE cars SET status = 'booked' WHERE id = ?`,
+      [carId]
+    );
     }
     res.redirect('/admin/bookings');
   } catch (err) {
