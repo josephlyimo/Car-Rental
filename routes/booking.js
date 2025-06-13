@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+
 const db = require('../config/db');
+const dayjs = require('dayjs');
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
@@ -22,8 +24,6 @@ function isAdmin(req, res, next) {
   res.status(403).json({ message: 'Forbidden' });
 }
 
-const moment = require('dayjs');
-
 // GET booking form with car_id and user info form
 router.get('/new', isAuthenticated, async (req, res) => {
   const user = req.session.user;
@@ -37,7 +37,7 @@ router.get('/new', isAuthenticated, async (req, res) => {
         car = carRows[0];
       }
     }
-    const today = moment().format('YYYY-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     res.render('book', { user, cars, car, today });
   } catch (err) {
     console.error(err);
@@ -93,10 +93,32 @@ router.post('/', isAuthenticated, async (req, res) => {
       return res.status(409).json({ message: 'Car is already booked for the selected dates' });
     }
 
-    // Insert booking with status 'pending'
+    // Get car price and base rental duration
+    const [cars] = await db.execute(
+      `SELECT price, base_rental_duration FROM cars WHERE id = ?`,
+      [car_id]
+    );
+    if (cars.length === 0) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+    const car = cars[0];
+
+    // Calculate total days
+    const start = dayjs(start_date);
+    const end = dayjs(end_date);
+    const totalDays = end.diff(start, 'day') + 1;
+
+    // Calculate price
+    let totalPrice = car.price;
+    if (totalDays > car.base_rental_duration) {
+      const extraDays = totalDays - car.base_rental_duration;
+      totalPrice += extraDays * 20000;
+    }
+
+    // Insert booking with status 'pending' and total price
     await db.execute(
-      `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, 'pending')`,
-      [user_id, car_id, purpose, start_date, end_date]
+      `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status, total_price) VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+      [user_id, car_id, purpose, start_date, end_date, totalPrice]
     );
 
     // Remove car status update here; admin will update car status upon confirmation
@@ -105,7 +127,7 @@ router.post('/', isAuthenticated, async (req, res) => {
     //   [car_id]
     // );
 
-    res.status(201).json({ message: 'Booking created successfully' });
+    res.status(201).json({ message: 'Booking created successfully', totalPrice });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

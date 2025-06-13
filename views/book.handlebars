@@ -5,6 +5,8 @@
     <p>Car Name: {{car.name}}</p>
     <p>Car Color: {{car.color}}</p>
     <p>Car Type: {{car.type}}</p>
+    <p>Price: {{car.price}} For {{car.base_rental_duration}} days</p>
+    <p>Note: If booking exceeds {{car.base_rental_duration}} days, price increases by 20,000 per extra day.</p>
     <input type="hidden" id="car_id" name="car_id" value="{{car.id}}" />
     <p>Purpose: {{car.type}}</p>
     <input type="hidden" id="purpose" name="purpose" value="{{car.type}}" />
@@ -13,6 +15,8 @@
       <p>Car Name: {{name}}</p>
       <p>Car Color: {{color}}</p>
       <p>Car Type: {{type}}</p>
+      <p>Price: {{price}} For {{base_rental_duration}} days</p>
+      <p>Note: If booking exceeds {{base_rental_duration}} days, price increases by 20,000 per extra day.</p>
       <input type="hidden" id="car_id" name="car_id" value="{{id}}" />
       <p>Purpose: {{type}}</p>
       <input type="hidden" id="purpose" name="purpose" value="{{type}}" />

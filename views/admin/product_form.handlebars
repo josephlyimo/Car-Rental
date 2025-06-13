@@ -34,5 +34,11 @@
   {{/if}}
 
   <br />
+  <label for="price">Price:</label><br />
+  <input type="number" id="price" name="price" value="{{#if product}}{{product.price}}{{else}}150000{{/if}}" required /><br />
+
+  <label for="base_rental_duration">Base Rental Duration (days):</label><br />
+  <input type="number" id="base_rental_duration" name="base_rental_duration" value="3" readonly /><br />
+
   <button type="submit">{{#if product}}Update{{else}}Add{{/if}} Product</button>
 </form>

@@ -12,6 +12,7 @@ st<h2>Admin Product Management</h2>
       <th>Type</th>
       <th>Color</th>
       <th>Status</th>
+      <th>Price</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -29,6 +30,7 @@ st<h2>Admin Product Management</h2>
       <td>{{this.type}}</td>
       <td>{{this.color}}</td>
       <td>{{this.status}}</td>
+      <td>{{this.price}}</td>
       <td>
         <a href="/admin/products/edit/{{this.id}}">Edit</a> |
         <form action="/admin/products/delete/{{this.id}}" method="POST" style="display:inline;">

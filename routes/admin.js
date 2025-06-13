@@ -42,13 +42,14 @@ router.get('/products/new', isAdmin, (req, res) => {
 
 // Admin create product
 router.post('/products/new', isAdmin, uploadProductImage.single('image'), async (req, res) => {
-  const { name, type, color, status, description } = req.body;
+  const { name, type, color, status, description, price } = req.body;
+  const base_rental_duration = 3; // fixed value, not editable by admin
   const imageUrl = req.file ? `/uploads/products/${req.file.filename}` : null;
 
   try {
     const [result] = await db.execute(
-      'INSERT INTO cars (name, type, color, status, description) VALUES (?, ?, ?, ?, ?)',
-      [name, type, color, status, description]
+      'INSERT INTO cars (name, type, color, status, description, price, base_rental_duration) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, type, color, status, description, price, base_rental_duration]
     );
     const carId = result.insertId;
     if (imageUrl) {
@@ -86,13 +87,14 @@ router.get('/products/edit/:id', isAdmin, async (req, res) => {
 // Admin update product
 router.post('/products/edit/:id', isAdmin, uploadProductImage.single('image'), async (req, res) => {
   const productId = req.params.id;
-  const { name, type, color, status, description } = req.body;
+  const { name, type, color, status, description, price } = req.body;
+  const base_rental_duration = 3; // fixed value, not editable by admin
   const imageUrl = req.file ? `/uploads/products/${req.file.filename}` : null;
 
   try {
     await db.execute(
-      'UPDATE cars SET name = ?, type = ?, color = ?, status = ?, description = ? WHERE id = ?',
-      [name, type, color, status, description, productId]
+      'UPDATE cars SET name = ?, type = ?, color = ?, status = ?, description = ?, price = ?, base_rental_duration = ? WHERE id = ?',
+      [name, type, color, status, description, price, base_rental_duration, productId]
     );
     if (imageUrl) {
       // Delete old images for simplicity, then insert new image
