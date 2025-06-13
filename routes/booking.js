@@ -79,6 +79,14 @@ router.post('/', isAuthenticated, async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
+  // Enforce minimum rental duration of 3 days
+  const start = dayjs(start_date);
+  const end = dayjs(end_date);
+  const totalDays = end.diff(start, 'day') + 1;
+  if (totalDays < 3) {
+    return res.status(400).json({ message: 'Minimum rental duration is 3 days' });
+  }
+
   if (new Date(start_date) > new Date(end_date)) {
     return res.status(400).json({ message: 'Start date must be before end date' });
   }
@@ -93,33 +101,33 @@ router.post('/', isAuthenticated, async (req, res) => {
       return res.status(409).json({ message: 'Car is already booked for the selected dates' });
     }
 
-    // Get car price and base rental duration
-    const [cars] = await db.execute(
-      `SELECT price, base_rental_duration FROM cars WHERE id = ?`,
-      [car_id]
-    );
-    if (cars.length === 0) {
-      return res.status(404).json({ message: 'Car not found' });
-    }
-    const car = cars[0];
+  // Get car price and base rental duration
+  const [cars] = await db.execute(
+    `SELECT price, base_rental_duration FROM cars WHERE id = ?`,
+    [car_id]
+  );
+  if (cars.length === 0) {
+    return res.status(404).json({ message: 'Car not found' });
+  }
+  const car = cars[0];
 
-    // Calculate total days
-    const start = dayjs(start_date);
-    const end = dayjs(end_date);
-    const totalDays = end.diff(start, 'day') + 1;
+  // Calculate total days
+  const start = dayjs(start_date);
+  const end = dayjs(end_date);
+  const totalDays = end.diff(start, 'day') + 1;
 
-    // Calculate price
-    let totalPrice = car.price;
-    if (totalDays > car.base_rental_duration) {
-      const extraDays = totalDays - car.base_rental_duration;
-      totalPrice += extraDays * 20000;
-    }
+  // Calculate price
+  let totalPrice = car.price;
+  if (totalDays > car.base_rental_duration) {
+    const extraDays = totalDays - car.base_rental_duration;
+    totalPrice += extraDays * 20000;
+  }
 
-    // Insert booking with status 'pending' and total price
-    await db.execute(
-      `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status, total_price) VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
-      [user_id, car_id, purpose, start_date, end_date, totalPrice]
-    );
+  // Insert booking with status 'pending' and total price
+  await db.execute(
+    `INSERT INTO bookings (user_id, car_id, purpose, start_date, end_date, status, total_price) VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+    [user_id, car_id, purpose, start_date, end_date, totalPrice]
+  );
 
     // Remove car status update here; admin will update car status upon confirmation
     // await db.execute(

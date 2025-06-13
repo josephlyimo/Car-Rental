@@ -5,8 +5,6 @@
     <p>Car Name: {{car.name}}</p>
     <p>Car Color: {{car.color}}</p>
     <p>Car Type: {{car.type}}</p>
-    <p>Price: {{car.price}} For {{car.base_rental_duration}} days</p>
-    <p>Note: If booking exceeds {{car.base_rental_duration}} days, price increases by 20,000 per extra day.</p>
     <input type="hidden" id="car_id" name="car_id" value="{{car.id}}" />
     <p>Purpose: {{car.type}}</p>
     <input type="hidden" id="purpose" name="purpose" value="{{car.type}}" />
@@ -15,41 +13,62 @@
       <p>Car Name: {{name}}</p>
       <p>Car Color: {{color}}</p>
       <p>Car Type: {{type}}</p>
-      <p>Price: {{price}} For {{base_rental_duration}} days</p>
-      <p>Note: If booking exceeds {{base_rental_duration}} days, price increases by 20,000 per extra day.</p>
       <input type="hidden" id="car_id" name="car_id" value="{{id}}" />
       <p>Purpose: {{type}}</p>
       <input type="hidden" id="purpose" name="purpose" value="{{type}}" />
     {{/with}}
   {{/if}}
 
-  {{#unless car}}
-  {{!-- This block is now redundant because the else block above handles the no car case --}}
-  {{/unless}}
-
   <label for="start_date">Start Date:</label>
-  <input type="date" id="start_date" name="start_date" required min="{{today}}">
+  <input type="date" id="start_date" name="start_date" required>
 
   <label for="end_date">End Date:</label>
-  <input type="date" id="end_date" name="end_date" required min="{{today}}">
+  <input type="date" id="end_date" name="end_date" required>
+
+<script>
+  // Set min attribute to today for start_date and end_date inputs
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('start_date').setAttribute('min', today);
+  document.getElementById('end_date').setAttribute('min', today);
+</script>
+
+  <p id="priceInfo">Price: {{#if car}}{{car.price}}{{else}}{{cars.[0].price}}{{/if}} For 3 days</p>
+  <p>Note: If booking exceeds 3 days, price increases by 20,000 per extra day.</p>
 
   <button type="submit">Book Now</button>
 </form>
 
-<div id="notification" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; z-index: 1000;"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 <script>
-  function showNotification(message, isError = false) {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.style.backgroundColor = isError ? '#f44336' : '#4caf50';
-    notification.style.display = 'block';
-    setTimeout(() => {
-      notification.style.display = 'none';
-    }, 5000);
+  const bookingForm = document.getElementById('bookingForm');
+  const startDateInput = document.getElementById('start_date');
+  const endDateInput = document.getElementById('end_date');
+  const priceInfo = document.getElementById('priceInfo');
+
+  const basePrice = {{#if car}}{{car.price}}{{else}}{{cars.[0].price}}{{/if}};
+  const baseRentalDuration = 3;
+  const extraDayPrice = 20000;
+
+  function updatePrice() {
+    const startDate = dayjs(startDateInput.value);
+    const endDate = dayjs(endDateInput.value);
+    if (!startDate.isValid() || !endDate.isValid()) {
+      priceInfo.textContent = `Price: ${basePrice} For ${baseRentalDuration} days`;
+      return;
+    }
+    const totalDays = endDate.diff(startDate, 'day') + 1;
+    if (totalDays <= baseRentalDuration) {
+      priceInfo.textContent = `Price: ${basePrice} For ${baseRentalDuration} days`;
+    } else {
+      const extraDays = totalDays - baseRentalDuration;
+      const totalPrice = basePrice + extraDays * extraDayPrice;
+      priceInfo.textContent = `Price: ${totalPrice} (Includes extra ${extraDays} day(s) charge)`;
+    }
   }
 
-  const bookingForm = document.getElementById('bookingForm');
+  startDateInput.addEventListener('change', updatePrice);
+  endDateInput.addEventListener('change', updatePrice);
+
   bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(bookingForm);
@@ -67,16 +86,24 @@
         body: JSON.stringify(data)
       });
       if (response.ok) {
-        showNotification('Booking created successfully!');
+        // Show success message on page instead of alert
+        const successMessage = document.createElement('div');
+        successMessage.textContent = 'Booking created successfully!';
+        successMessage.style.backgroundColor = '#4caf50';
+        successMessage.style.color = 'white';
+        successMessage.style.padding = '10px';
+        successMessage.style.borderRadius = '5px';
+        successMessage.style.marginBottom = '10px';
+        bookingForm.parentNode.insertBefore(successMessage, bookingForm);
         setTimeout(() => {
           window.location.href = '/bookings/history';
-        }, 5000);
+        }, 2000);
       } else {
         const resData = await response.json();
-        showNotification('Error: ' + resData.message, true);
+        alert('Error: ' + resData.message);
       }
     } catch (err) {
-      showNotification('Error: ' + err.message, true);
+      alert('Error: ' + err.message);
     }
   });
 </script>

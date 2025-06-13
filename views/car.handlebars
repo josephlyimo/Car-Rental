@@ -2,7 +2,10 @@
 <p>Type: {{car.type}}</p>
 <p>Color: {{car.color}}</p>
 <p>Status: {{car.status}}</p>
-<p>Description: {{car.description}}</p>
+<div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; max-width: 600px;">
+  <h3>Description</h3>
+  <p style="white-space: pre-wrap;">{{car.description}}</p>
+</div>
 
 <p>Price {{car.price}} For {{car.base_rental_duration}} days</p>
 <p>Note: If booking exceeds {{car.base_rental_duration}} days, price increases by 20,000 per extra day.</p>

@@ -152,6 +152,31 @@ app.get('/search', async (req, res) => {
   }
 });
 
+// Booking history page
+app.get('/bookings/history', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  const user = req.session.user;
+  try {
+    let bookings;
+    if (user.role === 'admin') {
+      [bookings] = await db.execute(
+        `SELECT b.*, c.name AS car_name, c.color, c.type, b.total_price FROM bookings b JOIN cars c ON b.car_id = c.id ORDER BY b.start_date DESC`
+      );
+    } else {
+      [bookings] = await db.execute(
+        `SELECT b.*, c.name AS car_name, c.color, c.type, b.total_price FROM bookings b JOIN cars c ON b.car_id = c.id WHERE b.user_id = ? ORDER BY b.start_date DESC`,
+        [user.id]
+      );
+    }
+    res.render('bookings', { user, bookings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);

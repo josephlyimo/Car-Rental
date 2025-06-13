@@ -1,0 +1,2 @@
+ALTER TABLE bookings
+ADD total_price INT NOT NULL DEFAULT 0;
