@@ -18,6 +18,14 @@
           <a href="/admin/users">Manage Admins</a> |
           <a href="/admin/bookings">Manage Bookings</a>
         </nav>
+      {{else}}
+        <nav>
+          <a href="/">Home</a> |
+          <a href="/cars">Available Cars</a> |
+          <a href="/bookings/new">Book a Car</a> |
+          <a href="/bookings/history">My Bookings</a> |
+          <a href="/users/profile">My Profile</a>
+        </nav>
       {{/if}}
     {{else}}
       <p><a href="/users/login">Login</a> | <a href="/users/register">Register</a></p>

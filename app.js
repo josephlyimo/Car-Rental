@@ -1,4 +1,3 @@
-
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
@@ -33,6 +32,32 @@ const hbs = exphbs.create({
   helpers: {
     eq: function(a, b) {
       return a === b;
+    },
+    ifCond: function(v1, operator, v2, options) {
+      switch (operator) {
+        case '==':
+          return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '===':
+          return (v1 === v2) ? options.fn(this) : options.inverse(this);
+        case '!=':
+          return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '!==':
+          return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+          return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+          return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+          return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+          return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        case '&&':
+          return (v1 && v2) ? options.fn(this) : options.inverse(this);
+        case '||':
+          return (v1 || v2) ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
     }
   }
 });
@@ -53,6 +78,7 @@ const adminRoutes = require('./routes/admin');
 
 app.use('/users', userRoutes);
 app.use('/cars', carRoutes);
+app.use('/bookings', bookingRoutes);
 app.use('/admin', adminRoutes);
 // Car detail page
 app.get('/cars/:id', async (req, res) => {
@@ -105,41 +131,6 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Booking form page
-app.get('/bookings/new', async (req, res) => {
-  try {
-    const [cars] = await db.execute('SELECT * FROM cars WHERE status = ?', ['available']);
-    res.render('book', { user: req.session.user, cars });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
-
-// Booking history page
-app.get('/bookings/history', async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  const user = req.session.user;
-  try {
-    let bookings;
-    if (user.role === 'admin') {
-      [bookings] = await db.execute(
-        `SELECT b.*, c.name AS car_name, c.color, c.type FROM bookings b JOIN cars c ON b.car_id = c.id ORDER BY b.start_date DESC`
-      );
-    } else {
-      [bookings] = await db.execute(
-        `SELECT b.*, c.name AS car_name, c.color, c.type FROM bookings b JOIN cars c ON b.car_id = c.id WHERE b.user_id = ? ORDER BY b.start_date DESC`,
-        [user.id]
-      );
-    }
-    res.render('bookings', { user, bookings });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
 
 // Search results route
 app.get('/search', async (req, res) => {
