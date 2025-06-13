@@ -131,37 +131,43 @@ router.get('/', isAuthenticated, async (req, res) => {
   }
 });
 
-// User marks booking as returned
-router.put('/:id/return', isAuthenticated, async (req, res) => {
+// User cancels a booking
+router.post('/:id/cancel', isAuthenticated, async (req, res) => {
   const bookingId = req.params.id;
   const userId = req.session.user.id;
 
   try {
-    // Verify booking belongs to user and status is 'rented'
+    // Verify booking belongs to user and status is 'pending'
     const [bookings] = await db.execute(
-      `SELECT * FROM bookings WHERE id = ? AND user_id = ? AND status = 'rented'`,
+      `SELECT * FROM bookings WHERE id = ? AND user_id = ? AND status = 'pending'`,
       [bookingId, userId]
     );
     if (bookings.length === 0) {
-      return res.status(404).json({ message: 'Booking not found or not eligible for return' });
+      return res.status(404).json({ message: 'Booking not found or not eligible for cancellation' });
     }
 
-    // Update booking status to 'returned'
+    // Move booking to booking_history and delete from bookings
     await db.execute(
-      `UPDATE bookings SET status = 'returned' WHERE id = ?`,
+      `INSERT INTO booking_history (user_id, car_id, purpose, start_date, end_date, status, created_at)
+       SELECT user_id, car_id, purpose, start_date, end_date, 'cancelled', created_at FROM bookings WHERE id = ?`,
+      [bookingId]
+    );
+    await db.execute(
+      `DELETE FROM bookings WHERE id = ?`,
       [bookingId]
     );
 
-    // Insert return log
+    // Update car status to 'available'
+    const carId = bookings[0].car_id;
     await db.execute(
-      `INSERT INTO return_logs (booking_id, returned_by_user, confirmed_by_admin) VALUES (?, TRUE, FALSE)`,
-      [bookingId]
+      `UPDATE cars SET status = 'available' WHERE id = ?`,
+      [carId]
     );
 
-    res.json({ message: 'Return marked, awaiting admin confirmation' });
+    res.json({ message: 'Booking cancelled successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Cancel booking error:', err.message);
+    res.status(500).json({ message: 'An unexpected error occurred. Please try again later.' });
   }
 });
 

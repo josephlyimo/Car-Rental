@@ -23,6 +23,8 @@
       <td>
         {{#ifCond status "==" "rented"}}
           <button class="return-btn" data-id="{{id}}">Mark as Returned</button>
+        {{else ifCond status "==" "pending"}}
+          <button class="cancel-btn" data-id="{{id}}">Cancel Booking</button>
         {{else}}
           -
         {{/ifCond}}
@@ -47,6 +49,29 @@
           });
           if (response.ok) {
             alert('Return marked successfully.');
+            location.reload();
+          } else {
+            const data = await response.json();
+            alert('Error: ' + data.message);
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.cancel-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const bookingId = button.getAttribute('data-id');
+      if (confirm('Cancel this booking?')) {
+        try {
+          const response = await fetch(`/bookings/${bookingId}/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (response.ok) {
+            alert('Booking cancelled successfully.');
             location.reload();
           } else {
             const data = await response.json();

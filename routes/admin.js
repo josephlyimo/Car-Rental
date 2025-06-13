@@ -8,7 +8,7 @@ function isAdmin(req, res, next) {
   if (req.session && req.session.user && req.session.user.role === 'admin') {
     return next();
   }
-  res.status(403).send('Forbidden');
+  res.redirect('/users/login');
 }
 
 // Admin profile page
@@ -251,7 +251,7 @@ router.post('/bookings/confirm/:id', isAdmin, async (req, res) => {
     if (bookings.length > 0) {
       const carId = bookings[0].car_id;
       await db.execute(
-        `UPDATE cars SET status = 'not-available' WHERE id = ?`,
+        `UPDATE cars SET status = 'booked' WHERE id = ?`,
         [carId]
       );
     }
