@@ -1,17 +1,9 @@
--- Car Rental System Database Schema
--- Created for Node.js backend usage
--- Includes all tables, constraints, and indexes
-
--- Create the database
-CREATE DATABASE IF NOT EXISTS car_rental_system;
-USE car_rental_system;
-
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 02, 2025 at 11:05 AM
+-- Generation Time: Jul 07, 2025 at 09:55 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -79,6 +71,13 @@ CREATE TABLE `booking_history` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `booking_history`
+--
+
+INSERT INTO `booking_history` (`id`, `user_id`, `car_id`, `purpose`, `start_date`, `end_date`, `status`, `created_at`) VALUES
+(1, 2, 3, 'ceremony', '2025-07-08', '2025-07-15', 'cancelled', '2025-07-07 14:27:42');
+
 -- --------------------------------------------------------
 
 --
@@ -92,8 +91,18 @@ CREATE TABLE `cars` (
   `color` varchar(50) DEFAULT NULL,
   `type` enum('tour','ceremony','private') NOT NULL,
   `status` enum('available','booked','rented','returned') DEFAULT 'available',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `price` int(11) NOT NULL,
+  `base_rental_duration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cars`
+--
+
+INSERT INTO `cars` (`id`, `name`, `description`, `color`, `type`, `status`, `created_at`, `price`, `base_rental_duration`) VALUES
+(3, 'nice', 'Tours and family', 'Blue', 'ceremony', 'available', '2025-07-05 15:12:25', 200, 3),
+(4, 'testing', 'Tours and family', 'Blue', 'ceremony', 'available', '2025-07-07 11:57:33', 200, 3);
 
 -- --------------------------------------------------------
 
@@ -106,6 +115,14 @@ CREATE TABLE `car_images` (
   `car_id` int(11) NOT NULL,
   `image_url` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `car_images`
+--
+
+INSERT INTO `car_images` (`id`, `car_id`, `image_url`) VALUES
+(3, 3, '/uploads/products/1751728345246-814243458.jpg'),
+(4, 4, '/uploads/products/1751889453023-594414812.jpg');
 
 -- --------------------------------------------------------
 
@@ -148,8 +165,19 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('admin','user') DEFAULT 'user',
+  `profile_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `profile_image`, `created_at`) VALUES
+(1, 'Joseph', 'josephlyimo201@gmail.com', '$2b$10$NtJpTDbbGFUTI5z/ibnx9uDYWrwUOkMELyrF9.ieycRHwa8yumtzC', 'admin', '1751913905738-99928492.jpg', '2025-07-04 17:17:14'),
+(2, 'Jinxlee', 'jaylee199@gmail.com', '$2b$10$gsa9Nk.ApbX2ARxdI/ZbjuMNMksvA2AOZIdbgnQ7h6Wwl64UMgLy.', 'user', '1751888608292-375431828.JPG', '2025-07-04 22:21:12'),
+(3, 'Teddy_Lee', 'nyuchitheresia@gmail.com', '$2b$10$TgIXreHbxPMBcYSSefjaiOBybffK3y.8NMc8MChuTcrh72snkRjSK', 'user', '1751722094316-345725398.jpg', '2025-07-05 13:24:25'),
+(4, 'Rahma', 'rahmaproject@gmail.com', '$2b$10$PM5PddesN4dlIPzDQWLObuuNauEPV/n271sa2RweDPVSeMeG5u6ty', 'admin', '1751890567814-879239929.jpg', '2025-07-07 12:15:26');
 
 --
 -- Indexes for dumped tables
@@ -225,25 +253,25 @@ ALTER TABLE `admin_logs`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `booking_history`
 --
 ALTER TABLE `booking_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cars`
 --
 ALTER TABLE `cars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `car_images`
 --
 ALTER TABLE `car_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `return_logs`
@@ -261,7 +289,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
