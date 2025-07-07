@@ -7,37 +7,70 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <header>
-    <h1>Car Rental System</h1>
-    {{#if user}}
-      <p>Welcome, {{user.name}} | <a href="/users/logout">Logout</a></p>
-      {{#if (eq user.role "admin")}}
-        <nav>
-          <a href="/admin/profile">Admin Profile</a> |
-          <a href="/admin/products">Manage Products</a> |
-          <a href="/admin/users">Manage Admins</a> |
-          <a href="/admin/bookings">Manage Bookings</a>
-        </nav>
+  <div class="topbar">
+    <h2>CAR RENTAL</h2>
+    <form id="filterForm" autocomplete="off" class="mb-20">
+      <label for="color">Color:</label>
+      <select id="color" name="color">
+        <option value="" selected>All</option>
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+        <option value="black">Black</option>
+        <option value="white">White</option>
+      </select>
+
+      <label for="type">Type:</label>
+      <select id="type" name="type">
+        <option value="" selected>All</option>
+        <option value="tour">Tour</option>
+        <option value="ceremony">Ceremony</option>
+        <option value="private">Private</option>
+      </select>
+
+      <button type="submit" class="btn">Filter</button>
+    </form>
+
+    <form id="searchForm" autocomplete="off" class="mb-20" style="position: relative;">
+      <label for="searchInput">Search Cars:</label>
+      <input type="text" id="searchInput" name="search" placeholder="Search cars...">
+      <button type="submit" class="btn">Search</button>
+      <div id="suggestions" class="suggestions-box"></div>
+    </form>
+
+    <div>
+      {{#if user}}
+        <span><b>Welcome, {{user.name}}</b></span>
+        <a href="/users/logout" class="logout">Logout</a>
       {{else}}
-        <nav>
-          <a href="/">Home</a> |
-          <a href="/cars">Available Cars</a> |
-          <a href="/bookings/new">Book a Car</a> |
-          <a href="/bookings/history">My Bookings</a> |
-          <a href="/users/profile">My Profile</a>
-        </nav>
+        <a href="/users/login">Login</a> | <a href="/users/register">Register</a>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="sidebar">
+    {{#if user}}
+      {{#if (eq user.role "admin")}}
+        <a href="/admin/profile">Admin Profile</a>
+        <a href="/admin/products">Manage Products</a>
+        <a href="/admin/users">Manage Admins</a>
+        <a href="/admin/bookings">Manage Bookings</a>
+      {{else}}
+        <a href="/">Home</a>
+        <a href="/cars">Available Cars</a>
+        <a href="/bookings/new">Book a Car</a>
+        <a href="/bookings/history">My Bookings</a>
+        <a href="/users/profile">My Profile</a>
       {{/if}}
     {{else}}
-      <p><a href="/users/login">Login</a> | <a href="/users/register">Register</a></p>
+      <a href="/users/login">Login</a>
+      <a href="/users/register">Register</a>
     {{/if}}
-    <hr />
-  </header>
+  </div>
 
-  {{{body}}}
+  <div class="main">
+    {{{body}}}
+  </div>
 
-  <footer>
-    <hr />
-    <p>&copy; 2024 Car Rental System</p>
-  </footer>
+  <div class="footer">FOOTER</div>
 </body>
 </html>

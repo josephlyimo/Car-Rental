@@ -1,12 +1,37 @@
-<h2>Login</h2>
-<form action="/users/login" method="POST">
-  <div>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required />
+<div class="login-container">
+  <div class="login-left-panel">
+    <h2>Hello!</h2>
+    <p>Don't have an account?</p>
+    <a href="/users/register" class="btn btn-outline">Register</a>
   </div>
-  <div>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required />
+  <div class="login-right-panel">
+    <h2>Login</h2>
+    <p>Enter your credentials to continue</p>
+    <form action="/users/login" method="POST" class="login-form">
+      <div class="form-group">
+        <input type="text" id="username" name="username" placeholder="Username" required />
+      </div>
+      <div class="form-group password-group">
+        <input type="password" id="password" name="password" placeholder="Password" required />
+        <span class="toggle-password" onclick="togglePasswordVisibility()">&#128065;</span>
+      </div>
+      <a href="/users/forgot-password" class="forgot-password">Forgot Password?</a>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <!--<p class="social-login-text">or login with</p>-->
+    <!--<div class="social-login-icons">
+      <a href="/auth/google" class="social-icon google" title="Login with Google">G</a>
+      <a href="/auth/facebook" class="social-icon facebook" title="Login with Facebook">f</a>
+      <a href="/auth/github" class="social-icon github" title="Login with GitHub">&#x1F5C3;</a>
+      <a href="/auth/linkedin" class="social-icon linkedin" title="Login with LinkedIn">in</a>
+    </div>-->
   </div>
-  <button type="submit">Login</button>
-</form>
+</div>
+
+<script>
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const type = passwordInput.getAttribute('type');
+    passwordInput.setAttribute('type', type === 'password' ? 'text' : 'password');
+  }
+</script>

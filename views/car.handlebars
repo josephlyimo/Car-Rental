@@ -2,7 +2,7 @@
 <p>Type: {{car.type}}</p>
 <p>Color: {{car.color}}</p>
 <p>Status: {{car.status}}</p>
-<div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; max-width: 600px;">
+<div class="car-card" style="max-width: 600px;">
   <h3>Description</h3>
   <p style="white-space: pre-wrap;">{{car.description}}</p>
 </div>
@@ -13,7 +13,7 @@
 {{#if user}}
   <form action="/bookings/new" method="GET">
     <input type="hidden" name="car_id" value="{{car.id}}" />
-    <button type="submit">Proceed to Booking</button>
+    <button type="submit" class="btn">Proceed to Booking</button>
   </form>
 {{else}}
   <p><a href="/users/login">Login</a> to proceed with booking.</p>
