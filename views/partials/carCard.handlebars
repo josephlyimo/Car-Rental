@@ -1,0 +1,20 @@
+<div class="car-card">
+  <img src="{{#if images}}{{images.[0]}}{{else}}/images/default-car.png{{/if}}" alt="{{name}}" class="car-image" />
+  <div class="car-details">
+    <h3 style="font-">{{name}}</h3>
+    <p>Color: {{color}}</p>
+    <p>Type: {{type}}</p>
+    <p>Price per day: ${{price}}</p>
+   <!-- <a href="/cars/{{id}}" class="btn btn-primary">View Details</a> -->
+    {{#if @root.user}}
+      {{#unless (eq @root.user.role "admin")}}
+        <form action="/bookings/new" method="GET" style="margin-top: 10px;">
+          <input type="hidden" name="car_id" value="{{id}}" />
+          <button type="submit" class="btn btn-secondary" style="width: 100%; background-color:aliceblue; color:black;">Book Now</button>
+        </form>
+      {{/unless}}
+    {{else}}
+      <p><a href="/users/login">Login</a> to book this car.</p>
+    {{/if}}
+  </div>
+</div>

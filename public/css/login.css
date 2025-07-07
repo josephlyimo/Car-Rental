@@ -1,0 +1,172 @@
+/* Login Page Styles */
+.login-container {
+  display: flex;
+  min-height: 75vh;
+  background-color: var(--background);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.login-left-panel {
+  flex: 1;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.login-left-panel h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.login-left-panel p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.login-left-panel .btn-outline {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.login-left-panel .btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.login-right-panel {
+  flex: 1;
+  background-color: var(--surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  box-shadow: var(--shadow);
+}
+
+.login-right-panel h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.login-right-panel p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-light);
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.login-form .form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.login-form input[type="text"],
+
+.login-form input[type="text"]:focus,
+.login-form input[type="password"]:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+   /* top: 50%;
+  transform: translateY(-50%);*/
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--secondary);
+  user-select: none;
+}
+
+.forgot-password {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: var(--primary-dark);
+}
+
+.login-form button.btn-primary {
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.error-message {
+  color: var(--danger);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.success-message {
+  color: var(--success);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Responsive Login Page */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left-panel,
+  .login-right-panel {
+    flex: none;
+    width: 100%;
+    padding: 2rem 1rem;
+  }
+
+  .login-left-panel h2 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Password Feedback Message */
+#passwordFeedback {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  min-height: 1.25rem;
+}

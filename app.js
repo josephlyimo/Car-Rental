@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 
 const hbs = exphbs.create({
   defaultLayout: 'main',
+  partialsDir: path.join(__dirname, 'views', 'partials'),
   helpers: {
     eq: function(a, b) {
       return a === b;
@@ -91,6 +92,7 @@ app.get('/cars/:id', async (req, res) => {
     const car = cars[0];
     const [images] = await db.execute('SELECT image_url FROM car_images WHERE car_id = ?', [carId]);
     car.images = images.map(img => img.image_url);
+    console.log('Rendering car detail page for car:', car);
     res.render('car', { user: req.session.user, car });
   } catch (err) {
     console.error(err);

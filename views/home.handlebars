@@ -61,9 +61,9 @@
 
   {{#if user}}
   {{#if (eq user.role "user")}}
-    <div class="mb-20">
+    <!--<div class="mb-20">
       <a href="/bookings/new" class="btn btn-primary">Continue Booking</a>
-    </div>
+    </div>-->
   {{else if (eq user.role "admin")}}
     <div class="mb-20">
       <a href="/bookings/history" class="btn btn-secondary">View Bookings</a>
@@ -72,30 +72,34 @@
 {{/if}}
 
 <div id="car-list">
-  {{#each cars}}
-    <div class="car-card">
-      {{#if this.image_url}}
-        <img src="{{this.image_url}}" alt="{{this.name}}" class="car-image" />
-      {{/if}}
-      <div class="car-details">
-        <h3>{{this.name}}</h3>
-        <p><strong>Description:</strong> {{{this.description}}}</p>
-        <p><strong>Type:</strong> {{this.type}}</p>
-        <p><strong>Color:</strong> {{this.color}}</p>
-        <p><strong>Status:</strong> {{this.status}}</p>
-        <p><strong>Price:</strong> {{this.price}} For {{this.base_rental_duration}} days</p>
-        <p>Note: If booking exceeds {{this.base_rental_duration}} days, price increases by 20,000 per extra day.</p>
-        <a href="/cars/{{this.id}}">View Details</a>
-        {{#if (eq ../user.role "user")}}
-          <div class="mt-10">
-            <a href="/bookings/new?car_id={{this.id}}" class="btn btn-primary">Book This Car</a>
-          </div>
-        {{/if}}
+  <div id="car-listings" class="car-grid">
+    {{#if loading}}
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
       </div>
-    </div>
-  {{else}}
-    <p>No cars available at the moment.</p>
-  {{/each}}
+      {{else}}
+      {{#each cars}}
+        {{> carCard this}}
+      {{/each}}
+    {{/if}}
+  </div>
+
+  {{!-- Or for skeleton loading --}}
+  <div id="car-listings" class="car-grid">
+    {{#if loading}}
+      {{#each (repeat 6)}}
+        <div class="car-card skeleton skeleton-card">
+          <div class="skeleton skeleton-text short"></div>
+          <div class="skeleton skeleton-text medium"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+      {{/each}}
+    {{else}}
+      {{#each cars}}
+        {{> carCard this}}
+      {{/each}}
+    {{/if}}
+  </div>
 </div>
 
 <script>

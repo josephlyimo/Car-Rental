@@ -136,3 +136,23 @@
     currentCancelId = null;
   });
 </script>
+
+<script>
+  // Remove time and timezone from start_date and end_date cells by formatting date string
+  document.querySelectorAll('tbody tr').forEach(row => {
+    const startDateCell = row.children[2];
+    const endDateCell = row.children[3];
+    if (startDateCell) {
+      const date = new Date(startDateCell.textContent);
+      if (!isNaN(date)) {
+        startDateCell.textContent = date.toDateString();
+      }
+    }
+    if (endDateCell) {
+      const date = new Date(endDateCell.textContent);
+      if (!isNaN(date)) {
+        endDateCell.textContent = date.toDateString();
+      }
+    }
+  });
+</script>

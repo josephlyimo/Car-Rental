@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { uploadProductImage } = require('../config/multer');
+const { uploadProductImage, uploadProfileImage } = require('../config/multer');
 
 // Middleware to check if user is admin
 function isAdmin(req, res, next) {
@@ -15,6 +15,33 @@ function isAdmin(req, res, next) {
 router.get('/profile', isAdmin, (req, res) => {
   const user = req.session.user;
   res.render('admin/profile', { user });
+});
+
+// GET admin profile image edit form
+router.get('/profile/edit', isAdmin, (req, res) => {
+  const user = req.session.user;
+  res.render('admin/profile_edit', { user });
+});
+
+// POST admin profile image upload
+router.post('/profile/edit', isAdmin, uploadProfileImage.single('profileImage'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'Please select an image to upload' });
+    }
+    const profileImage = req.file.filename;
+    const userId = req.session.user.id;
+
+    await db.execute('UPDATE users SET profile_image = ? WHERE id = ?', [profileImage, userId]);
+
+    // Update session user profileImage
+    req.session.user.profileImage = profileImage;
+
+    res.redirect('/admin/profile');
+  } catch (err) {
+    console.error('Error updating admin profile image:', err);
+    res.status(500).render('admin/profile_edit', { user: req.session.user, error: 'Server error' });
+  }
 });
 
 // Admin products list page
@@ -158,7 +185,9 @@ router.post('/register', async (req, res) => {
       'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, 'admin']
     );
-    res.send('Admin registered successfully. You can now login.');
+    // Set success message in session
+    req.session.successMessage = 'Admin registered successfully. You can now login.';
+    res.redirect('/users/login');
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');

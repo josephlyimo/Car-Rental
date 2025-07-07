@@ -5,49 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Car Rental System</title>
   <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="topbar">
     <h2>CAR RENTAL</h2>
-    <form id="filterForm" autocomplete="off" class="mb-20">
-      <label for="color">Color:</label>
-      <select id="color" name="color">
-        <option value="" selected>All</option>
-        <option value="red">Red</option>
-        <option value="blue">Blue</option>
-        <option value="black">Black</option>
-        <option value="white">White</option>
-      </select>
+    <!--<div class="topbar-center">-->
+    {{#if (eq @root._locals.view "home")}}
+      <form id="filterForm" autocomplete="off" class="mb-20">
+        <label for="color">Color:</label>
+        <select id="color" name="color">
+          <option value="" selected>All</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+        </select>
 
-      <label for="type">Type:</label>
-      <select id="type" name="type">
-        <option value="" selected>All</option>
-        <option value="tour">Tour</option>
-        <option value="ceremony">Ceremony</option>
-        <option value="private">Private</option>
-      </select>
+        <label for="type">Type:</label>
+        <select id="type" name="type">
+          <option value="" selected>All</option>
+          <option value="tour">Tour</option>
+          <option value="ceremony">Ceremony</option>
+          <option value="private">Private</option>
+        </select>
 
-      <button type="submit" class="btn">Filter</button>
-    </form>
+        <button type="submit" class="btn">Filter</button>
+      </form>
 
-    <form id="searchForm" autocomplete="off" class="mb-20" style="position: relative;">
-      <label for="searchInput">Search Cars:</label>
-      <input type="text" id="searchInput" name="search" placeholder="Search cars...">
-      <button type="submit" class="btn">Search</button>
-      <div id="suggestions" class="suggestions-box"></div>
-    </form>
-
-    <div>
+      <form id="searchForm" autocomplete="off" class="mb-20" style="position: relative;">
+        <label for="searchInput">Search Cars:</label>
+        <input type="text" id="searchInput" name="search" placeholder="Search cars...">
+        <button type="submit" class="btn">Search</button>
+        <div id="suggestions" class="suggestions-box"></div>
+      </form>
+    {{else}}
       {{#if user}}
+        {{#unless (eq @root._locals.view "login")}}
+          {{#unless (eq @root._locals.view "register")}}
+            <form id="filterForm" autocomplete="off" class="mb-20">
+              <label for="color">Color:</label>
+              <select id="color" name="color">
+                <option value="" selected>All</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+                <option value="black">Black</option>
+                <option value="white">White</option>
+              </select>
+
+              <label for="type">Type:</label>
+              <select id="type" name="type">
+                <option value="" selected>All</option>
+                <option value="tour">Tour</option>
+                <option value="ceremony">Ceremony</option>
+                <option value="private">Private</option>
+              </select>
+
+              <button type="submit" class="btn">Filter</button>
+            </form>
+
+            <form id="searchForm" autocomplete="off" class="mb-20" style="position: relative;">
+              <!--<label for="searchInput">Search Cars:</label>-->
+              <input type="text" id="searchInput" name="search" placeholder="Search cars...">
+              <button type="submit" class="btn">Search</button>
+              <div id="suggestions" class="suggestions-box"></div>
+            </form>
+          {{/unless}}
+        {{/unless}}
+      {{/if}}
+    {{/if}}
+<div class="user-links">
+     {{#if user}}
+        <img src="/uploads/profiles/{{user.profileImage}}" alt="Profile Image" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; margin-right: 8px;" />
         <span><b>Welcome, {{user.name}}</b></span>
-        <a href="/users/logout" class="logout">Logout</a>
+        <a href="/users/logout" class="logout" style="margin-left: 10px;">Logout</a>
       {{else}}
         <a href="/users/login">Login</a> | <a href="/users/register">Register</a>
       {{/if}}
+      </div>
     </div>
+<!--
+    
+     
+    </div>
+    -->
   </div>
 
   <div class="sidebar">
+    <a href="/">Home</a>
     {{#if user}}
       {{#if (eq user.role "admin")}}
         <a href="/admin/profile">Admin Profile</a>
@@ -55,15 +100,11 @@
         <a href="/admin/users">Manage Admins</a>
         <a href="/admin/bookings">Manage Bookings</a>
       {{else}}
-        <a href="/">Home</a>
         <a href="/cars">Available Cars</a>
         <a href="/bookings/new">Book a Car</a>
         <a href="/bookings/history">My Bookings</a>
         <a href="/users/profile">My Profile</a>
       {{/if}}
-    {{else}}
-      <a href="/users/login">Login</a>
-      <a href="/users/register">Register</a>
     {{/if}}
   </div>
 

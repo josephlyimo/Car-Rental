@@ -19,9 +19,10 @@
     <tr>
       <td>
         <strong>{{this.car_name}}</strong><br />
-        Type: {{this.type}}<br />
+       <!-- Type: {{this.type}}<br />
         Color: {{this.color}}<br />
         Description: {{this.description}}
+        -->
       </td>
       <td>{{this.user_name}}<br />{{this.user_email}}</td>
       <td>{{this.purpose}}</td>
@@ -37,7 +38,7 @@
           <form action="/admin/bookings/mark-returned/{{this.id}}" method="POST" style="display:inline;">
             <button type="submit">Mark as Returned</button>
           </form>
-          <span>Not Returned / Pending</span>
+          <!--<span>Not Returned / Pending</span>-->
         {{else if (eq this.status "returned")}}
           <span>Returned</span>
         {{else}}
@@ -48,3 +49,23 @@
     {{/each}}
   </tbody>
 </table>
+
+<script>
+  // Remove time and timezone from start_date and end_date cells by formatting date string
+  document.querySelectorAll('tbody tr').forEach(row => {
+    const startDateCell = row.children[3];
+    const endDateCell = row.children[4];
+    if (startDateCell) {
+      const date = new Date(startDateCell.textContent);
+      if (!isNaN(date)) {
+        startDateCell.textContent = date.toDateString();
+      }
+    }
+    if (endDateCell) {
+      const date = new Date(endDateCell.textContent);
+      if (!isNaN(date)) {
+        endDateCell.textContent = date.toDateString();
+      }
+    }
+  });
+</script>
