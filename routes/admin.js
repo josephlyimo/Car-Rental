@@ -207,7 +207,7 @@ router.post('/users/new', isAdmin, async (req, res) => {
       return res.status(400).send('Email already registered');
     }
     // Hash password
-    const bcrypt = require('bcrypt');
+    const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash(password, 10);
     // Insert new admin user
     await db.execute(
