@@ -1,17 +1,56 @@
-<h2>Edit Admin Profile Image</h2>
-
-{{#if error}}
-  <p style="color: red;">{{error}}</p>
-{{/if}}
-
-<form action="/admin/profile/edit" method="POST" enctype="multipart/form-data">
-  <div>
-    <label for="profileImage">Upload Profile Image:</label>
-    <input type="file" id="profileImage" name="profileImage" accept="image/*" required />
+<div class="admin-register-container">
+  <div class="admin-register-header">
+    <h2>Edit Admin Profile</h2>
   </div>
-  <button type="submit">Upload</button>
-</form>
 
-<p>
-  <a href="/admin/profile">Back to Profile</a>
-</p>
+  {{#if error}}
+    <div class="error-message" style="color: var(--danger); margin-bottom: 1rem;">{{error}}</div>
+  {{/if}}
+
+  <form action="/admin/profile/edit" method="POST" enctype="multipart/form-data" class="admin-register-form">
+    <div class="form-group">
+      <label for="profileImage">Profile Image:</label>
+      <input type="file" id="profileImage" name="profileImage" accept="image/*" />
+    </div>
+
+    {{#if user.profileImage}}
+      <div class="current-image">
+        <h3>Current Profile Image:</h3>
+        <img src="/uploads/profiles/{{user.profileImage}}" alt="Profile Image" />
+      </div>
+    {{/if}}
+
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" value="{{user.name}}" required class="admin-input" />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" value="{{user.email}}" required class="admin-input" />
+    </div>
+
+    <h3>Change Password</h3>
+
+    <div class="form-group">
+      <label for="currentPassword">Current Password:</label>
+      <input type="password" id="currentPassword" name="currentPassword" class="admin-input" />
+    </div>
+
+    <div class="form-group">
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword" class="admin-input" />
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirm New Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" class="admin-input" />
+    </div>
+
+    <button type="submit" class="admin-register-btn">Update Profile</button>
+  </form>
+
+  <p>
+    <a href="/admin/profile">Back to Profile</a>
+  </p>
+</div>

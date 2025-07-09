@@ -1,42 +1,51 @@
-<h2>Book a Car</h2>
+<div class="booking-container">
+  <div class="booking-header">
+    <h2>Book a Car</h2>
+  </div>
 
-<form id="bookingForm">
-  {{#if car}}
-    <p>Car Name: {{car.name}}</p>
-    <p>Car Color: {{car.color}}</p>
-    <p>Car Type: {{car.type}}</p>
-    <input type="hidden" id="car_id" name="car_id" value="{{car.id}}" />
-    <p>Purpose: {{car.type}}</p>
-    <input type="hidden" id="purpose" name="purpose" value="{{car.type}}" />
-  {{else}}
-    {{#with cars.[0]}}
-      <p>Car Name: {{name}}</p>
-      <p>Car Color: {{color}}</p>
-      <p>Car Type: {{type}}</p>
-      <input type="hidden" id="car_id" name="car_id" value="{{id}}" />
-      <p>Purpose: {{type}}</p>
-      <input type="hidden" id="purpose" name="purpose" value="{{type}}" />
-    {{/with}}
-  {{/if}}
+  <form id="bookingForm" class="booking-form">
+    {{#if car}}
+      <div class="car-info">
+        <p><strong>Car Name:</strong> {{car.name}}</p>
+        <p><strong>Car Color:</strong> {{car.color}}</p>
+        <p><strong>Car Type:</strong> {{car.type}}</p>
+        <input type="hidden" id="car_id" name="car_id" value="{{car.id}}" />
+        <p><strong>Purpose:</strong> {{car.type}}</p>
+        <input type="hidden" id="purpose" name="purpose" value="{{car.type}}" />
+      </div>
+    {{else}}
+      {{#with cars.[0]}}
+        <div class="car-info">
+          <p><strong>Car Name:</strong> {{name}}</p>
+          <p><strong>Car Color:</strong> {{color}}</p>
+          <p><strong>Car Type:</strong> {{type}}</p>
+          <input type="hidden" id="car_id" name="car_id" value="{{id}}" />
+          <p><strong>Purpose:</strong> {{type}}</p>
+          <input type="hidden" id="purpose" name="purpose" value="{{type}}" />
+        </div>
+      {{/with}}
+    {{/if}}
 
-  <label for="start_date">Start Date:</label>
-  <input type="date" id="start_date" name="start_date" required>
+    <div class="date-group">
+      <div class="date-input">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" required>
+      </div>
 
-  <label for="end_date">End Date:</label>
-  <input type="date" id="end_date" name="end_date" required>
+      <div class="date-input">
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" required>
+      </div>
+    </div>
 
-<script>
-  // Set min attribute to today for start_date and end_date inputs
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('start_date').setAttribute('min', today);
-  document.getElementById('end_date').setAttribute('min', today);
-</script>
+    <div class="price-info" id="priceInfo">
+      Price: {{#if car}}{{car.price}}{{else}}{{cars.[0].price}}{{/if}} For 3 days
+    </div>
+    <p class="price-note">Note: If booking exceeds 3 days, price increases by 20,000 per extra day.</p>
 
-  <p id="priceInfo">Price: {{#if car}}{{car.price}}{{else}}{{cars.[0].price}}{{/if}} For 3 days</p>
-  <p>Note: If booking exceeds 3 days, price increases by 20,000 per extra day.</p>
-
-  <button type="submit">Book Now</button>
-</form>
+    <button type="submit" class="booking-submit">Book Now</button>
+  </form>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 <script>
@@ -66,10 +75,33 @@
     }
   }
 
+  startDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+  endDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+
   startDateInput.addEventListener('change', updatePrice);
   endDateInput.addEventListener('change', updatePrice);
 
   bookingForm.addEventListener('submit', async (e) => {
+    const today = new Date().toISOString().split('T')[0];
+    if (startDateInput.value < today) {
+      e.preventDefault();
+      alert('Start date cannot be in the past.');
+      startDateInput.focus();
+      return false;
+    }
+    if (endDateInput.value < today) {
+      e.preventDefault();
+      alert('End date cannot be in the past.');
+      endDateInput.focus();
+      return false;
+    }
+    if (endDateInput.value < startDateInput.value) {
+      e.preventDefault();
+      alert('End date cannot be before start date.');
+      endDateInput.focus();
+      return false;
+    }
+
     e.preventDefault();
     const formData = new FormData(bookingForm);
     const data = {

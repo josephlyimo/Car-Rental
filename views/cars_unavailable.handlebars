@@ -1,0 +1,59 @@
+<div class="main">
+  <h2>Unavailable Cars</h2>
+  {{#if cars.length}}
+  <table>
+    <thead>
+      <tr>
+        <th>Car Name</th>
+        <th>Status</th>
+        <th>Expected Availability</th>
+      </tr>
+    </thead>
+  <tbody>
+      {{#each cars}}
+      <tr>
+        <td>{{this.name}}</td>
+        <td>{{this.status}}</td>
+        <td>
+          <span class="availability-date" data-date="{{this.expected_availability}}">
+            {{this.expected_availability}}
+          </span>
+          <br/>
+          <span class="days-remaining"></span>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <p>No unavailable cars at the moment.</p>
+  {{/if}}
+
+  <script>
+    function updateDaysRemaining() {
+      const today = new Date();
+      document.querySelectorAll('.availability-date').forEach(span => {
+        const dateStr = span.getAttribute('data-date');
+        const availabilityDate = new Date(dateStr);
+        const daysRemainingSpan = span.nextElementSibling;
+        if (!isNaN(availabilityDate)) {
+          const diffTime = availabilityDate - today;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays > 0) {
+            daysRemainingSpan.textContent = diffDays + ' day(s) remaining';
+          } else if (diffDays === 0) {
+            daysRemainingSpan.textContent = 'Available today';
+          } else {
+            daysRemainingSpan.textContent = 'Available now';
+          }
+        } else {
+          daysRemainingSpan.textContent = 'Unknown availability';
+        }
+      });
+    }
+
+    updateDaysRemaining();
+    // Update every hour
+    setInterval(updateDaysRemaining, 3600000);
+  </script>
+</div>

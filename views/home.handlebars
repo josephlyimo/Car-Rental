@@ -83,23 +83,6 @@
       {{/each}}
     {{/if}}
   </div>
-
-  {{!-- Or for skeleton loading --}}
-  <div id="car-listings" class="car-grid">
-    {{#if loading}}
-      {{#each (repeat 6)}}
-        <div class="car-card skeleton skeleton-card">
-          <div class="skeleton skeleton-text short"></div>
-          <div class="skeleton skeleton-text medium"></div>
-          <div class="skeleton skeleton-text"></div>
-        </div>
-      {{/each}}
-    {{else}}
-      {{#each cars}}
-        {{> carCard this}}
-      {{/each}}
-    {{/if}}
-  </div>
 </div>
 
 <script>

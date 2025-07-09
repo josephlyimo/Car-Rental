@@ -32,6 +32,31 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Route to show unavailable cars with expected availability
+router.get('/unavailable', async (req, res) => {
+  try {
+    const [cars] = await db.execute(
+      `SELECT c.id, c.name, c.status, b.end_date AS expected_availability
+       FROM cars c
+       JOIN bookings b ON c.id = b.car_id
+       WHERE c.status IN ('booked', 'rented') AND b.status IN ('booked', 'rented')
+       ORDER BY b.end_date ASC`
+    );
+    // Format date to readable string
+    cars.forEach(car => {
+      if (car.expected_availability) {
+        car.expected_availability = new Date(car.expected_availability).toDateString();
+      } else {
+        car.expected_availability = 'Unknown';
+      }
+    });
+    res.render('cars_unavailable', { cars });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 // Get car details by id
 router.get('/:id', async (req, res) => {
   const carId = req.params.id;
@@ -49,27 +74,5 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-  // Search suggestions endpoint for autocomplete
-  router.get('/search-suggestions', async (req, res) => {
-    const { q } = req.query;
-    console.log('Search suggestions query:', q);
-    if (!q || q.trim() === '') {
-      return res.json([]);
-    }
-    const searchTerm = `%${q.trim()}%`;
-    try {
-      const [results] = await db.execute(
-        `SELECT DISTINCT name FROM cars WHERE status = 'available' AND name LIKE ? LIMIT 10`,
-        [searchTerm]
-      );
-      const suggestions = results.map(row => row.name);
-      console.log('Suggestions:', suggestions);
-      res.json(suggestions);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
 
 module.exports = router;

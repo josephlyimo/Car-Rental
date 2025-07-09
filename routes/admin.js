@@ -23,23 +23,62 @@ router.get('/profile/edit', isAdmin, (req, res) => {
   res.render('admin/profile_edit', { user });
 });
 
-// POST admin profile image upload
+const bcrypt = require('bcryptjs');
+
+// POST admin profile update including image upload and password change
 router.post('/profile/edit', isAdmin, uploadProfileImage.single('profileImage'), async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/users/login');
+  }
+
+  const userId = req.session.user.id;
+  const { name, email, currentPassword, newPassword, confirmPassword } = req.body;
+  let profileImage = null;
+
   try {
-    if (!req.file) {
-      return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'Please select an image to upload' });
+    // Handle profile image upload if file provided
+    if (req.file) {
+      profileImage = req.file.filename;
+      await db.execute('UPDATE users SET profile_image = ? WHERE id = ?', [profileImage, userId]);
+      req.session.user.profileImage = profileImage;
     }
-    const profileImage = req.file.filename;
-    const userId = req.session.user.id;
 
-    await db.execute('UPDATE users SET profile_image = ? WHERE id = ?', [profileImage, userId]);
+    // Fetch current user data for password validation
+    const [rows] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).render('admin/profile_edit', { user: req.session.user, error: 'User not found' });
+    }
+    const user = rows[0];
 
-    // Update session user profileImage
-    req.session.user.profileImage = profileImage;
+    // Validate and update password if requested
+    if (currentPassword || newPassword || confirmPassword) {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'Please fill all password fields' });
+      }
+      const match = await bcrypt.compare(currentPassword, user.password_hash);
+      if (!match) {
+        return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'Current password is incorrect' });
+      }
+      if (newPassword !== confirmPassword) {
+        return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'New passwords do not match' });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, userId]);
+    }
+
+    // Update name and email
+    if (!name || !email) {
+      return res.status(400).render('admin/profile_edit', { user: req.session.user, error: 'Name and email are required' });
+    }
+    await db.execute('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, userId]);
+
+    // Update session user info
+    req.session.user.name = name;
+    req.session.user.email = email;
 
     res.redirect('/admin/profile');
   } catch (err) {
-    console.error('Error updating admin profile image:', err);
+    console.error('Error updating admin profile:', err);
     res.status(500).render('admin/profile_edit', { user: req.session.user, error: 'Server error' });
   }
 });
@@ -52,7 +91,9 @@ router.get('/products', isAdmin, async (req, res) => {
     // Fetch images for each car
     for (const car of cars) {
       const [images] = await db.execute('SELECT image_url FROM car_images WHERE car_id = ?', [car.id]);
-      car.images = images.map(img => img.image_url);
+      // Filter duplicate image URLs
+      const uniqueImages = [...new Set(images.map(img => img.image_url))];
+      car.images = uniqueImages;
     }
     res.render('admin/products', { user, cars });
   } catch (err) {

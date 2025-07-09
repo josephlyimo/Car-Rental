@@ -19,28 +19,60 @@ router.get('/profile/edit', (req, res) => {
   res.render('user/profile_edit', { user: req.session.user });
 });
 
-// POST /profile/edit - handle profile image upload
+// POST /profile/edit - handle profile image upload and profile update
 router.post('/profile/edit', uploadProfileImage.single('profileImage'), async (req, res) => {
-  console.log('Profile image upload route hit');
   if (!req.session.user) {
-    console.log('No user session found, redirecting to login');
     return res.redirect('/users/login');
   }
-  if (!req.file) {
-    console.log('No file uploaded');
-    return res.status(400).render('user/profile_edit', { user: req.session.user, error: 'Please select an image to upload' });
-  }
+
+  const userId = req.session.user.id;
+  const { name, email, currentPassword, newPassword, confirmPassword } = req.body;
+  let profileImage = null;
+
   try {
-    console.log('File uploaded:', req.file);
-    const profileImage = req.file.filename;
-    const userId = req.session.user.id;
-    await db.execute('UPDATE users SET profile_image = ? WHERE id = ?', [profileImage, userId]);
-    // Update session user profileImage
-    req.session.user.profileImage = profileImage;
-    console.log('Profile image updated in database and session');
+    // Handle profile image upload if file provided
+    if (req.file) {
+      profileImage = req.file.filename;
+      await db.execute('UPDATE users SET profile_image = ? WHERE id = ?', [profileImage, userId]);
+      req.session.user.profileImage = profileImage;
+    }
+
+    // Fetch current user data for password validation
+    const [rows] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).render('user/profile_edit', { user: req.session.user, error: 'User not found' });
+    }
+    const user = rows[0];
+
+    // Validate and update password if requested
+    if (currentPassword || newPassword || confirmPassword) {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).render('user/profile_edit', { user: req.session.user, error: 'Please fill all password fields' });
+      }
+      const match = await bcrypt.compare(currentPassword, user.password_hash);
+      if (!match) {
+        return res.status(400).render('user/profile_edit', { user: req.session.user, error: 'Current password is incorrect' });
+      }
+      if (newPassword !== confirmPassword) {
+        return res.status(400).render('user/profile_edit', { user: req.session.user, error: 'New passwords do not match' });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, userId]);
+    }
+
+    // Update name and email
+    if (!name || !email) {
+      return res.status(400).render('user/profile_edit', { user: req.session.user, error: 'Name and email are required' });
+    }
+    await db.execute('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, userId]);
+
+    // Update session user info
+    req.session.user.name = name;
+    req.session.user.email = email;
+
     res.redirect('/users/profile');
   } catch (err) {
-    console.error('Error updating profile image:', err);
+    console.error('Error updating profile:', err);
     res.status(500).render('user/profile_edit', { user: req.session.user, error: 'Server error' });
   }
 });

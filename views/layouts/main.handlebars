@@ -93,6 +93,7 @@
 
   <div class="sidebar">
     <a href="/">Home</a>
+    <a href="/cars/unavailable">Unavailable Cars</a>
     {{#if user}}
       {{#if (eq user.role "admin")}}
         <a href="/admin/profile">Admin Profile</a>
@@ -101,7 +102,8 @@
         <a href="/admin/bookings">Manage Bookings</a>
       {{else}}
         <a href="/cars">Available Cars</a>
-        <a href="/bookings/new">Book a Car</a>
+        <!-- Removed Book a Car link as per request -->
+        <!-- <a href="/bookings/new">Book a Car</a> -->
         <a href="/bookings/history">My Bookings</a>
         <a href="/users/profile">My Profile</a>
       {{/if}}
